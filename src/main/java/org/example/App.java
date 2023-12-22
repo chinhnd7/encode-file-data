@@ -25,11 +25,11 @@ public class App
             String sha256Hash = calculateSHA256(pdfText);
 
             // base64 data
-            String base64Hash = encodeBase64(sha256Hash);
+            byte[] bytes = hexStringToByteArray(sha256Hash);
+            String base64Hash = encodeToBase64(bytes);
 
             System.out.println("SHA-256 Hash: " + sha256Hash);
             System.out.println("Base64 Hash: " + base64Hash);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -65,8 +65,20 @@ public class App
         }
     }
 
-    // Return base64 data
-    private static String encodeBase64(String input) {
-        return Base64.getEncoder().encodeToString(input.getBytes(StandardCharsets.UTF_8));
+    // Chuyển đổi chuỗi hex sang byte array
+    private static byte[] hexStringToByteArray(String hexString) {
+        int len = hexString.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i + 1), 16));
+        }
+        return data;
+    }
+
+    // Encode byte array sang base64
+    private static String encodeToBase64(byte[] bytes) {
+        byte[] encodedBytes = Base64.getEncoder().encode(bytes);
+        return new String(encodedBytes, StandardCharsets.UTF_8);
     }
 }
